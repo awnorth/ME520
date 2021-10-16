@@ -6,10 +6,9 @@
 
 // Next we will try to measure both pin 13 output voltage & A1 input (Capacitor Voltage)
 
-int analogPin0 = 0;  // "OUTPUT"
-int analogPin1 = 1;  // <-------NEW  "INPUT"
+int analogPin0 = A0;  // OUTPUT
 int val0 = 0;
-int val1 = 1;  // <-------NEW   "INPUT"
+int input = 0;  // INPUT
 
 int voltageState = LOW;
 
@@ -42,12 +41,17 @@ void loop() {
     }
 
     digitalWrite(13, voltageState);
+    if (voltageState == HIGH) {
+      input = 1023;
+    } else {
+      input = 0;
+    }
+    
   }
   
   val0 = analogRead(analogPin0);   // analogRead returns an int (0 to 1023)
-  val1 = analogRead(analogPin1);   // read the "INPUT"
-  //val1 = analogRead(analogpin1);  // <-------NEW
-  Serial.println(val0);
+  Serial.print(val0);
   Serial.print(",");
-  Serial.println(val1);  // <-------NEW
+  Serial.print(input);  // INPUT
+  Serial.println();
 }
