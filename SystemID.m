@@ -22,7 +22,7 @@ a2 = thetaLS(2,1);
 b1 = thetaLS(3,1);
 b2 = thetaLS(4,1);
 
-% Test the transfer function with the difference equation:
+% Test the new 2nd order system model:
 y_1 = a1*phi_1;
 y_2 = a2*phi_2;
 y_3 = b1*phi_3;
@@ -41,10 +41,41 @@ legend('System Input','System Output','Simulated Output')
 
 % Check the error with residuals
 e = Y-y_hat;
-plot(T,e,'.');
-title('System Model Residuals (Error)');
+plot(T,e,'-*');
+title('2nd Order System Model Residuals (Error)');
 xlabel('time (seconds)');
 ylabel('Error (voltage)');
+
+% % Try a 1st order system
+% phi = [phi_1 phi_3];
+% thetaLS = ((phi'*phi)^-1)*phi'*Y;
+% a1 = thetaLS(1,1);
+% b1 = thetaLS(2,1);
+% % Test the 1st order system model:
+% y_hat = phi*thetaLS;
+% e = Y-y_hat;  % Check residual errors
+% plot(T,e,'-*')
+% title('1st Order System Model Residuals (Error)');
+% xlabel('time (seconds)');
+% ylabel('Error (voltage)');
+
+% % Try a 3rd order system
+% phi_1 = -M(2:end-2,3); % -y(k-1)
+% phi_2 = -M(3:end-1,3); % -y(k-2)
+% phi_3 = -M(4:end,3);   % -y(k-3)
+% phi_4 = M(2:end-2,2);  % u(k-1) 
+% phi_5 = M(3:end-1,2);  % u(k-2)
+% phi_6 = M(4:end,2);    % u(k-3)
+% phi = [phi_1 phi_2 phi_3 phi_4 phi_5 phi_6];
+% Y = M(1:end-3,3);  % re-define Y length
+% T = M(1:end-3,1);  % re-define time matrix length
+% thetaLS = ((phi'*phi)^-1)*phi'*Y;  % Parameters vector
+% y_hat = phi*thetaLS;
+% e = Y-y_hat;  % Check residual errors
+% plot(T,e,'-*');
+% title('3rd Order System Model Residuals (Error)');
+% xlabel('time (seconds)');
+% ylabel('Error (voltage)');
 
 % ------------------------- STEP 3 ------------------------- %
 % Transfer function sys
@@ -62,10 +93,10 @@ P1(2:end-1) = 2*P1(2:end-1);
 freq_inp = Fs*(0:(L/2))/L;  % graph on x-axis
 
 % Plot frequency response
-plot(freq_inp,P1);
-title('Input Frequency Response');
-xlabel('frequency (Hz)')
-ylabel('Magnitude')
+% plot(freq_inp,P1);
+% title('Input Frequency Response');
+% xlabel('frequency (Hz)')
+% ylabel('Magnitude')
 
 
 
