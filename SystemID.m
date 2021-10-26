@@ -1,5 +1,7 @@
 % ME520 System ID Assignment
 
+close all; clear; clc;
+
 % ------------------------- STEP 2 ------------------------- %
 M = readmatrix('data_SystemID.csv');
 
@@ -33,6 +35,7 @@ y_hat = phi*thetaLS;
 
 % Plot both the original input and output data, and the output from the new
 % system model
+figure;
 plot(T,Usys,':',T,Y,':',T,y_test,'LineWidth',2); 
 title('System Model Test')
 xlabel('time (seconds)')
@@ -41,6 +44,7 @@ legend('System Input','System Output','Simulated Output')
 
 % Check the error with residuals
 e = Y-y_hat;
+figure;
 plot(T,e,'-*');
 title('2nd Order System Model Residuals (Error)');
 xlabel('time (seconds)');
@@ -81,6 +85,7 @@ ylabel('Error (voltage)');
 % Transfer function sys
 sys = tf([b1,b2],[1,a1,a2]);
 U = M(2:end,2);  % U is the input data
+Y = M(2:end,3);
 L = length(U);
 Fs = 50;    % Hz
 
@@ -92,11 +97,26 @@ P1 = P2(1:L/2+1);  % graph on y-axis
 P1(2:end-1) = 2*P1(2:end-1);
 freq_inp = Fs*(0:(L/2))/L;  % graph on x-axis
 
+% Output frequency domain ID using fft
+fft_out = fft(Y);
+P2o = abs(fft_out/L);
+P1o = P2o(1:L/2+1);  % graph on y-axis
+P1o(2:end-1) = 2*P1o(2:end-1);
+freq_out = Fs*(0:(L/2))/L;  % graph on x-axis
+
+% System frequency response
+fft_G = fft_out./fft_inp;
+P2g = abs(fft_G/L);
+P1g = P2g(1:L/2+1);  % graph on y-axis
+P1g(2:end-1) = 2*P1g(2:end-1);
+freq_G = Fs*(0:(L/2))/L;  % graph on x-axis
+
 % Plot frequency response
-% plot(freq_inp,P1);
-% title('Input Frequency Response');
-% xlabel('frequency (Hz)')
-% ylabel('Magnitude')
+figure;
+plot(freq_G,P1g);
+title('System Frequency Response');
+xlabel('frequency (Hz)')
+ylabel('Magnitude')
 
-
+% ------------------------- STEP 4 ------------------------- %
 
