@@ -1,4 +1,6 @@
-% ME520 System ID Assignment
+% ME520 System ID Assignment - 10_27_2021
+% Taylor Ayars
+% Andrew North
 
 close all; clear; clc;
 
@@ -133,4 +135,63 @@ plot(freq_G_model,P1gm);
 legend('Measured Freq Response','Model Freq Response');
 
 % ------------------------- STEP 4 ------------------------- %
-dt = 0.02;
+U = M(2:end,2);
+Y = M(2:end,3);  % Updated Y length
+deltaT = 0.02;  % Approximate time step in data
+% System ID Toolbox. 
+
+% ----------------- Weighted Least Squares ----------------- %
+MM = readmatrix('data_SystemID_ChangeDynamics.csv');
+N = 289;  % Number of data measurements
+
+% Parameters
+aw1 = [];
+aw2 = [];
+bw1 = [];
+bw2 = [];
+
+for N = 1:285
+    YY = MM(1:N,3);
+    UU = MM(1:N,2);
+    TT = MM(1:N,1)'; % time matrix
+    phi_1 = -MM(2:N+1,3);  % -y(k-1)  output
+    phi_2 = -MM(3:N+2,3);    % -y(k-2)  output
+    phi_3 = MM(2:N+1,2);   % u(k-1)   input
+    phi_4 = MM(3:N+2,2);     % u(k-2)   input
+    phi = [phi_1 phi_2 phi_3 phi_4];
+    
+    gamma = .99; % 0.2
+    
+    WW = eye(N);
+    % Create Weight matrix
+    for row = 1:N
+        for col = 1:N;
+            if row == col
+                WW(row, col) = gamma^(N-row)-gamma^(N-row+1);
+            end
+        end
+    end
+    
+    thetaWLS = inv(phi'*WW*phi)*phi'*WW*YY;
+    y_hat_Weighted = phi*thetaWLS;
+    
+    % plot(TT,UU,':',TT,YY,':',TT,y_hat_Weighted,'LineWidth',2); 
+    % plot(TT,y_hat_Weighted,'LineWidth',2); 
+    % calculate the new parameters
+    aw1(N) = thetaWLS(1,1);
+    aw2(N) = thetaWLS(2,1);
+    bw1(N) = thetaWLS(3,1);
+    bw2(N) = thetaWLS(4,1);
+end
+
+figure();
+subplot(2,1,1);
+plot(TT,aw1);
+title('A1 Parameter')
+xlabel('time (seconds)')
+ylabel('A1 Value')
+subplot(2,1,2);
+plot(TT,aw2);
+title('A2 Parameter')
+xlabel('time (seconds)')
+ylabel('A2 Value')
