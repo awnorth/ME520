@@ -32,6 +32,7 @@ y_4 = b2*phi_4;
 y_test = [y_1+y_2+y_3+y_4];
 % Or cleaner implementation:
 y_hat = phi*thetaLS;
+G_hat = y_hat./Usys';
 
 % Plot both the original input and output data, and the output from the new
 % system model
@@ -89,7 +90,6 @@ Y = M(2:end,3);
 L = length(U);
 Fs = 50;    % Hz
 
-
 % Input frequency domain ID using fft
 fft_inp = fft(U);
 P2 = abs(fft_inp/L);
@@ -117,6 +117,20 @@ plot(freq_G,P1g);
 title('System Frequency Response');
 xlabel('frequency (Hz)')
 ylabel('Magnitude')
+hold on;
+
+% Compare to step 2
+u = Usys';
+fft_u = fft(u);
+fft_y_hat = fft(y_hat);
+fft_G_model = fft_y_hat./fft_u;
+P2gm = abs(fft_G_model/L);
+P1gm = P2gm(1:L/2+1);  % graph on y-axis
+P1gm(2:end-1) = 2*P1gm(2:end-1);
+freq_G_model = Fs*(0:(L/2))/L;  % graph on x-axis
+
+plot(freq_G_model,P1gm);
+legend('Measured Freq Response','Model Freq Response');
 
 % ------------------------- STEP 4 ------------------------- %
-
+dt = 0.02;
